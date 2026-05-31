@@ -56,7 +56,17 @@ export default {
       this.$emit("close");
     },
     saveItem() {
-      this.$emit("save", this.form);
+      if (
+        !this.form.kode ||
+        !this.form.judul ||
+        !this.form.kategori ||
+        !this.form.upbjj
+      ) {
+        alert("Kode, Judul, Kategori, dan UT-daerah wajib diisi.");
+        return;
+      }
+
+      this.$emit("save", this.form satisfies Stock);
     },
   },
 };

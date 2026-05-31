@@ -1,11 +1,13 @@
 <script lang="ts">
 import StockFilter from "./stock/stock-filter.vue";
 import FormModal from "./stock/form-modal.vue";
+import StockTable from "./stock/stock-table.vue";
 
 export default {
   components: {
     FormModal,
     StockFilter,
+    StockTable,
   },
   data: () => ({
     stok: [
@@ -139,22 +141,21 @@ export default {
 
       if (this.sortBy) {
         result.sort((a, b) => {
-          let aVal = a[this.sortBy];
-          let bVal = b[this.sortBy];
+          let aVal = a[this.sortBy as keyof typeof a];
+          let bVal = b[this.sortBy as keyof typeof b];
 
-          // Untuk string, gunakan localeCompare
           if (typeof aVal === "string") {
             aVal = aVal.toLowerCase();
-            bVal = bVal.toLowerCase();
+            bVal = String(bVal).toLowerCase();
             return this.sortOrder === "asc"
               ? aVal.localeCompare(bVal)
               : bVal.localeCompare(aVal);
           }
 
           if (this.sortOrder === "asc") {
-            return aVal - bVal;
+            return aVal - Number(bVal);
           } else {
-            return bVal - aVal;
+            return Number(bVal) - aVal;
           }
         });
       }
@@ -168,50 +169,22 @@ export default {
     },
   },
   methods: {
-    closeModal() {
-      this.openModal = false;
-      this.resetForm();
-    },
-    resetForm() {
-      this.form = {
-        kode: "",
-        judul: "",
-        kategori: "",
-        upbjj: "",
-        lokasiRak: "",
-        harga: 0,
-        qty: 0,
-        safety: 0,
-        catatanHTML: "",
-      };
-    },
-    openAddModal() {
-      this.resetForm();
-      this.openModal = true;
-    },
     openEditModal(item: any) {
       this.selectedItem = item;
       this.openModal = true;
     },
-    async saveItem() {
-      if (
-        !this.form.kode ||
-        !this.form.judul ||
-        !this.form.kategori ||
-        !this.form.upbjj
-      ) {
-        alert("Kode, Judul, Kategori, dan UT-daerah wajib diisi.");
-        return;
-      }
-
-      const index = this.stok.findIndex((i) => i.kode === this.form.kode);
+    closeModal() {
+      this.openModal = false;
+      this.selectedItem = undefined;
+    },
+    async saveItem(item: Stock) {
+      const index = this.stok.findIndex((i) => i.kode === item.kode);
       if (index !== -1) {
-        this.stok.splice(index, 1, { ...this.form });
+        this.stok.splice(index, 1, { ...item });
       } else {
-        this.stok.push({ ...this.form });
+        this.stok.push({ ...item });
       }
-      this.closeModal();
-      await nextTick();
+      this.openModal = false;
     },
 
     resetFilters() {
@@ -228,7 +201,7 @@ export default {
       this.filters.reorderWarning = !this.filters.reorderWarning;
     },
 
-    handleSort(field) {
+    handleSort(field: string) {
       if (this.sortBy === field) {
         this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
       } else {
@@ -247,7 +220,7 @@ export default {
         <h2><i class="bx bx-data"></i> Manajemen Stok Bahan Ajar</h2>
       </div>
       <div class="panel-actions">
-        <button class="btn-tambah" @click="openAddModal()">
+        <button class="btn-tambah" @click="openModal = true">
           <i class="bx bx-plus"></i>
           <span>Tambah Stok Baru</span>
         </button>
@@ -264,6 +237,14 @@ export default {
       @update:sortBy="sortBy = $event"
       @update:sortOrder="sortOrder = $event"
     ></stock-filter>
+
+    <stock-table
+      :stocks="sortedData"
+      :sortBy="sortBy"
+      :sortOrder="sortOrder"
+      @sort-change="handleSort"
+      @edit-stock="openEditModal"
+    ></stock-table>
   </section>
 
   <form-modal

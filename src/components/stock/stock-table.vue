@@ -1,39 +1,20 @@
 <script lang="ts">
 export default {
   props: {
-    data: {
-      type: Array,
+    stocks: {
+      type: Array<Stock>,
       required: true,
     },
     sortBy: {
       type: String,
-      required: false,
+      default: "",
     },
     sortOrder: {
       type: String,
-      required: false,
+      default: "asc",
     },
   },
-  computed: {
-    sortedData() {
-      if (!this.sortBy) return this.data;
-
-      return [...this.data].sort((a, b) => {
-        const valA = a[this.sortBy];
-        const valB = b[this.sortBy];
-
-        if (typeof valA === "number" && typeof valB === "number") {
-          return this.sortOrder === "asc" ? valA - valB : valB - valA;
-        }
-
-        const strA = String(valA).toLowerCase();
-        const strB = String(valB).toLowerCase();
-        if (strA < strB) return this.sortOrder === "asc" ? -1 : 1;
-        if (strA > strB) return this.sortOrder === "asc" ? 1 : -1;
-        return 0;
-      });
-    },
-  },
+  emits: ["sort-change", "edit-stock"],
 };
 </script>
 
@@ -46,7 +27,7 @@ export default {
             <button
               class="th-sort-btn"
               :class="{ active: sortBy === 'judul' }"
-              @click="handleSort('judul')"
+              @click="$emit('sort-change', 'judul')"
               title="Klik untuk sort"
             >
               Kode & Nama Barang
@@ -67,7 +48,7 @@ export default {
             <button
               class="th-sort-btn"
               :class="{ active: sortBy === 'qty' }"
-              @click="handleSort('qty')"
+              @click="$emit('sort-change', 'qty')"
               title="Klik untuk sort"
             >
               Total Stok
@@ -85,7 +66,7 @@ export default {
             <button
               class="th-sort-btn"
               :class="{ active: sortBy === 'harga' }"
-              @click="handleSort('harga')"
+              @click="$emit('sort-change', 'harga')"
               title="Klik untuk sort"
             >
               Harga
@@ -104,7 +85,7 @@ export default {
         </tr>
       </thead>
       <tbody id="tableBodyStok">
-        <tr v-for="item in sortedData">
+        <tr v-for="item in stocks" :key="item.kode">
           <td>
             <div class="book-title">
               <strong>{{ item.kode }}</strong>
@@ -140,7 +121,7 @@ export default {
           <td>Rp {{ item.harga.toLocaleString("id-ID") }}</td>
           <td v-html="item.catatanHTML"></td>
           <td>
-            <button class="btn-edit" @click="openEditModal(item)">
+            <button class="btn-edit" @click="$emit('edit-stock', item)">
               <i class="bx bx-edit"></i>
             </button>
           </td>
