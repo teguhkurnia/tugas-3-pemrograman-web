@@ -1,11 +1,13 @@
 <script lang="ts">
 import AppSidebar from "./components/app-sidebar.vue";
 import StockPage from "./components/stock-page.vue";
+import TrackingPage from "./components/tracking-page.vue";
 
 export default {
   components: {
     AppSidebar,
     StockPage,
+    TrackingPage,
   },
   data() {
     return {
@@ -38,6 +40,9 @@ export default {
 
     <div class="" v-if="page === 'stock'">
       <stock-page></stock-page>
+    </div>
+    <div class="" v-else-if="page === 'tracking'">
+      <tracking-page></tracking-page>
     </div>
   </main>
 </template>
