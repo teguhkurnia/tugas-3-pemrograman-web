@@ -13,7 +13,6 @@ interface DataState {
 }
 
 export default {
-  name: "DeliveryTracker",
   components: {
     SearchDo,
     TrackingResult,
@@ -156,20 +155,23 @@ export default {
 
 <template>
   <div>
-    <SearchDO
+    <search-do
       :errorMessage="errorMessage"
       @search="handleSearch"
       @openForm="showForm = true"
-    />
+    ></search-do>
 
-    <TrackingResult v-if="searchResult" :result="searchResult" />
+    <tracking-result
+      v-if="searchResult"
+      :result="searchResult"
+    ></tracking-result>
 
-    <AddDOModal
+    <add-do-modal
       :show="showForm"
       :upbjjList="upbjjList"
       :paketList="paketList"
       @close="showForm = false"
       @save="handleSaveDO"
-    />
+    ></add-do-modal>
   </div>
 </template>

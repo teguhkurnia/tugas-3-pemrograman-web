@@ -9,7 +9,6 @@ const initialForm = {
 };
 
 export default {
-  name: "AddDOModal",
   props: {
     show: {
       type: Boolean,

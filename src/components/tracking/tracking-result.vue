@@ -1,6 +1,5 @@
 <script lang="ts">
 export default {
-  name: "TrackingResult",
   props: {
     result: {
       type: Object as () => DeliveryOrder,
